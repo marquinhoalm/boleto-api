@@ -14,9 +14,9 @@ const registerBoleto = `
             <!--Optional:-->
             <nsu>?</nsu>
             <!--Optional:-->
-            <ticket>?</ticket>
+            <ticket>{{unscape .Authentication.AuthorizationToken}}</ticket>
             <!--Optional:-->
-            <tpAmbiente>?</tpAmbiente>
+            <tpAmbiente>T</tpAmbiente>
          </dto>
       </impl:registraTitulo>
    </soapenv:Body>
@@ -92,107 +92,95 @@ const requestTicket = `
                 </entry>
                 <entry>
                     <key>CONVENIO.COD-CONVENIO</key>
-                    <value>123456789</value>
+                    <value>{{.Agreement.AgreementNumber}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.TP-DOC</key>
-                    <value>99</value>
+                    {{if eq .Buyer.Document.Type "CPF"}}
+					 	<value>01</value>
+                    {{else}}
+					 	<value>02</value>
+					{{end}}                    
                 </entry>
                 <entry>
                     <key>PAGADOR.NUM-DOC</key>
-                    <value>999999999999999</value>
+                    <value>{{.Buyer.Document.Number}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.NOME</key>
-                    <value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+                    <value>{{.Buyer.Name}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.ENDER</key>
-                    <value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+                    <value>{{.Buyer.Address.Street}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.BAIRRO</key>
-                    <value>xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+                    <value>{{.Buyer.Address.District}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.CIDADE</key>
-                    <value>xxxxxxxxxxxxxxxxxxxx</value>
+                    <value>{{.Buyer.Address.City}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.UF</key>
-                    <value>xx</value>
+                    <value>{{.Buyer.Address.StateCode}}</value>
                 </entry>
                 <entry>
                     <key>PAGADOR.CEP</key>
-                    <value>99999999</value>
+                    <value>{{.Buyer.Address.ZipCode}}</value>
                 </entry>
                 <entry>
                     <key>TITULO.NOSSO-NUMERO</key>
-                    <value>9999999999999</value>
+                    <value>{{.Title.OurNumber}}</value>
                 </entry>
                 <entry>
                     <key>TITULO.SEU-NUMERO </key>
-                    <value>xxxxxxxxxxxxxxx</value>
+                    <value>{{.Title.DocumentNumber}}</value>
                 </entry>
                 <entry>
                     <key>TITULO.DT-VENCTO</key>
-                    <value>ddmmaaaa</value>
+                    <value>{{brdate .Title.ExpireDateTime}}</value>
                 </entry>
                 <entry>
                     <key>TITULO.DT-EMISSAO</key>
-                    <value>ddmmaaaa</value>
+                    <value>{{today | brdate}}</value>
                 </entry>
                 <entry>
-                    <key>TITULO.ESPECIE</key><
-                    value>xx</value>
-                </entry>
-                <entry>
-                    <key>TITULO.VL-NOMINAL</key>
-                    <value>999999999999999</value>
-                </entry>
-                <entry>
-                    <key>TITULO.PC-MULTA</key>
-                    <value>99999</value>
-                </entry>
-                <entry>
-                    <key>TITULO.QT-DIAS-MULTA</key>
-                    <value>99</value>
-                </entry>
-                <entry>
-                    <key>TITULO.PC-JURO</key>
-                    <value>99999</value>
+                    <key>TITULO.ESPECIE</key>
+                    <value>1</value>
                 </entry>
                 <entry>
                     <key>TITULO.TP-DESC</key>
-                    <value>9</value>
+                    <value>0</value>
                 </entry>
                 <entry>
                     <key>TITULO.VL-DESC</key>
-                    <value>999999999999999</value>
+                    <value>0</value>
                 </entry>
                 <entry>
                     <key>TITULO.DT-LIMI-DESC</key>
-                    <value>ddmmaaaa</value>
-                </entry>
-                <entry>
-                    <key>TITULO.VL-ABATIMENTO</key>
-                    <value>999999999999999</value>
+                    <value>{{brdate .Title.ExpireDateTime}}</value>
                 </entry>
                 <entry>
                     <key>TITULO.TP-PROTESTO</key>
-                    <value>9</value>
+                    <value>0</value>
                 </entry>
                 <entry>
                     <key>TITULO.QT-DIAS-PROTESTO</key>
-                    <value>9</value>
+                    <value>0</value>
                 </entry>
                 <entry>
                     <key>TITULO.QT-DIAS-BAIXA</key>
-                    <value>9</value>
+                    <value>0</value>
                 </entry>
                 <entry>
+                    <key>TITULO.VL-NOMINAL</key>
+                    <value>{{.Title.AmountInCents}}</value>
+                </entry>                
+                <entry>
                     <key>MENSAGEM</key>
-                    <value>xxxxxxxxxxxxxxxxxxxxxxxxxxx</value>
+                    <value>{{.Title.Instructions}}</value>
                 </entry>
             </dados>
             <expiracao>100</expiracao>
