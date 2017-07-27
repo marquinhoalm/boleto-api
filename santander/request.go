@@ -148,20 +148,12 @@ const requestTicket = `
                 </entry>
                 <entry>
                     <key>TITULO.ESPECIE</key>
-                    <value>1</value>
+                    <value>99</value>
                 </entry>
                 <entry>
                     <key>TITULO.TP-DESC</key>
                     <value>0</value>
-                </entry>
-                <entry>
-                    <key>TITULO.VL-DESC</key>
-                    <value>0</value>
-                </entry>
-                <entry>
-                    <key>TITULO.DT-LIMI-DESC</key>
-                    <value>{{brdate .Title.ExpireDateTime}}</value>
-                </entry>
+                </entry>               
                 <entry>
                     <key>TITULO.TP-PROTESTO</key>
                     <value>0</value>
