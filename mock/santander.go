@@ -87,15 +87,15 @@ func registerBoletoSantander(c *gin.Context) {
             <situacao>20</situacao>
             <titulo>
                <aceito>N</aceito>
-               <cdBarra/>
+               <cdBarra>23192839182391829382132131238219893123</cdBarra>
                <dtEmissao/>
                <dtEntr/>
                <dtLimiDesc/>
                <dtVencto/>
                <especie/>
-               <linDig/>
+               <linDig>21321312382198931232132131238219893123</linDig>
                <mensagem/>
-               <nossoNumero/>
+               <nossoNumero>313123131231231</nossoNumero>
                <pcJuro/>
                <pcMulta/>
                <qtDiasBaixa/>

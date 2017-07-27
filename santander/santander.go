@@ -2,6 +2,7 @@ package santander
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/PMoneda/flow"
@@ -44,14 +45,14 @@ func (b bankSantander) GetTicket(boleto *models.BoletoRequest) (string, error) {
 	pipe = pipe.To("logseq://?type=response&url="+url, b.log)
 	ch := pipe.Choice()
 	ch = ch.When(flow.Header("status").IsEqualTo("200"))
-	ch = ch.To("transform://?format=xml", getTicketResponse(), `{{.returnCode}},{{.ticket}}`)
+	ch = ch.To("transform://?format=xml", getTicketResponse(), `{{.returnCode}}:::{{unscape .ticket}}`, tmpl.GetFuncMaps())
 	ch = ch.Otherwise()
 	ch = ch.To("logseq://?type=request&url="+url, b.log)
 	ch = ch.To("set://?prop=body", errors.New("integration error"))
 	switch t := pipe.GetBody().(type) {
 	case string:
 		items := pipe.GetBody().(string)
-		parts := strings.Split(items, ",")
+		parts := strings.Split(items, ":::")
 		returnCode, ticket := parts[0], parts[1]
 		return ticket, checkError(returnCode)
 	case error:
@@ -62,7 +63,7 @@ func (b bankSantander) GetTicket(boleto *models.BoletoRequest) (string, error) {
 
 func (b bankSantander) RegisterBoleto(boleto *models.BoletoRequest) (models.BoletoResponse, error) {
 	r := flow.NewFlow()
-	serviceURL := config.Get().URLCiti
+	serviceURL := config.Get().URLRegisterBoletoSantander
 	from := getResponseSantander()
 	to := getAPIResponseSantander()
 	bod := r.From("message://?source=inline", boleto, getRequestSantander(), tmpl.GetFuncMaps())
@@ -72,12 +73,15 @@ func (b bankSantander) RegisterBoleto(boleto *models.BoletoRequest) (models.Bole
 	ch := bod.Choice()
 	ch = ch.When(flow.Header("status").IsEqualTo("200"))
 	ch = ch.To("transform://?format=xml", from, to, tmpl.GetFuncMaps())
+	//ch = ch.To("marshall://?format=json", new(models.BoletoResponse))
 	ch = ch.Otherwise()
 	ch = ch.To("logseq://?type=response&url="+serviceURL, b.log).To("apierro://")
 	switch t := bod.GetBody().(type) {
 	case string:
 		response := util.ParseJSON(t, new(models.BoletoResponse)).(*models.BoletoResponse)
 		return *response, nil
+	case error:
+		fmt.Println(t)
 	case models.BoletoResponse:
 		return t, nil
 	}
@@ -102,5 +106,5 @@ func (b bankSantander) ValidateBoleto(boleto *models.BoletoRequest) models.Error
 
 //GetBankNumber retorna o codigo do banco
 func (b bankSantander) GetBankNumber() models.BankNumber {
-	return models.Citibank
+	return models.Santander
 }

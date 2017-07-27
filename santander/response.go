@@ -11,11 +11,12 @@ var apiResponse = `
         ]
     {{else}}
         "DigitableLine": "{{fmtDigitableLine (trim .digitableLine)}}",
-        "BarCodeNumber": "{{trim .barcodeNumber}}"
+        "BarCodeNumber": "{{trim .barcodeNumber}}",
+        "OurNumber":"{{.ourNumber}}"
     {{end}}
 }
 `
 
 func getAPIResponseSantander() string {
-	return ""
+	return apiResponse
 }

@@ -1,6 +1,9 @@
 package santander
 
 const registerBoleto = `
+## SOAPAction:registraTitulo
+## Content-Type:text/xml
+
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:impl="http://impl.webservice.ymb.app.bsbr.altec.com/">
    <soapenv:Header/>
    <soapenv:Body>
@@ -28,50 +31,12 @@ const registerSantanderResponse = `
    <soapenv:Body>
       <dlwmin:registraTituloResponse xmlns:dlwmin="http://impl.webservice.ymb.app.bsbr.altec.com/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
          <return xmlns:ns2="http://impl.webservice.ymb.app.bsbr.altec.com/">
-            <codcede/>
-            <convenio>
-               <codBanco/>
-               <codConv/>
-            </convenio>
             <descricaoErro>{{errorMessage}}</descricaoErro>
-            <dtNsu>?</dtNsu>
-            <estacao>?</estacao>
-            <nsu>?</nsu>
-            <pagador>
-               <bairro/>
-               <cep/>
-               <cidade/>
-               <ender/>
-               <nome/>
-               <numDoc/>
-               <tpDoc/>
-               <uf/>
-            </pagador>
-            <situacao>20</situacao>
             <titulo>
-               <aceito>N</aceito>
                <cdBarra>{{barcodeNumber}}</cdBarra>
-               <dtEmissao/>
-               <dtEntr/>
-               <dtLimiDesc/>
-               <dtVencto/>
-               <especie/>
-               <linDig>{{digitableLine}}</linDig>
-               <mensagem/>
-               <nossoNumero>{{ourNumber}}</nossoNumero>
-               <pcJuro/>
-               <pcMulta/>
-               <qtDiasBaixa/>
-               <qtDiasMulta/>
-               <qtDiasProtesto/>
-               <seuNumero/>
-               <tpDesc/>
-               <tpProtesto/>
-               <vlAbatimento/>
-               <vlDesc/>
-               <vlNominal/>
+               <linDig>{{digitableLine}}</linDig>               
+               <nossoNumero>{{ourNumber}}</nossoNumero>               
             </titulo>
-            <tpAmbiente>?</tpAmbiente>
          </return>
       </dlwmin:registraTituloResponse>
    </soapenv:Body>
@@ -80,7 +45,7 @@ const registerSantanderResponse = `
 
 const requestTicket = `
 
-## SOAPAction:registraTitulo
+## SOAPAction:create
 ## Content-Type:text/xml
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:impl="http://impl.webservice.dl.app.bsbr.altec.com/">
