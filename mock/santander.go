@@ -1,6 +1,12 @@
 package mock
 
 import (
+	"net/http/httputil"
+
+	"strings"
+
+	"errors"
+
 	gin "gopkg.in/gin-gonic/gin.v1"
 )
 
@@ -28,7 +34,29 @@ func getTicket(c *gin.Context) {
 	</soapenv:Body> 
 	</soapenv:Envelope>
 	`
-	c.Data(200, "text/json", []byte(tok))
+
+	const tokErr = `
+	<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"> 
+	<soapenv:Body> 
+	<dlwmin:createResponse xmlns:dlwmin="http://impl.webservice.dl.app.bsbr.altec.com/"> 
+	<TicketResponse> 
+	<retCode>3</retCode> 
+	<ticket></ticket> 
+	</TicketResponse> 
+	</dlwmin:createResponse> 
+	</soapenv:Body> 
+	</soapenv:Envelope>
+	`
+	data, _ := httputil.DumpRequest(c.Request, true)
+	str := string(data)
+	if strings.Contains(str, "<value>3</value>") {
+		c.Data(200, "text/json", []byte(tokErr))
+	} else if strings.Contains(str, "<value>500</value>") {
+		c.AbortWithError(500, errors.New("internal error"))
+	} else {
+		c.Data(200, "text/json", []byte(tok))
+	}
+
 }
 
 func registerBoletoSantander(c *gin.Context) {

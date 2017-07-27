@@ -1,6 +1,9 @@
 package santander
 
 import (
+	"errors"
+	"strings"
+
 	"github.com/PMoneda/flow"
 	"github.com/mundipagg/boleto-api/config"
 	"github.com/mundipagg/boleto-api/log"
@@ -32,6 +35,30 @@ func New() bankSantander {
 func (b bankSantander) Log() *log.Log {
 	return b.log
 }
+func (b bankSantander) GetTicket(boleto *models.BoletoRequest) (string, error) {
+	pipe := flow.NewFlow()
+	url := config.Get().URLTicketSantander
+	pipe.From("message://?source=inline", boleto, getRequestTicket(), tmpl.GetFuncMaps())
+	pipe = pipe.To("logseq://?type=request&url="+url, b.log)
+	pipe.To(url, map[string]string{"method": "POST", "insecureSkipVerify": "true"})
+	pipe = pipe.To("logseq://?type=response&url="+url, b.log)
+	ch := pipe.Choice()
+	ch = ch.When(flow.Header("status").IsEqualTo("200"))
+	ch = ch.To("transform://?format=xml", getTicketResponse(), `{{.returnCode}},{{.ticket}}`)
+	ch = ch.Otherwise()
+	ch = ch.To("logseq://?type=request&url="+url, b.log)
+	ch = ch.To("set://?prop=body", errors.New("integration error"))
+	switch t := pipe.GetBody().(type) {
+	case string:
+		items := pipe.GetBody().(string)
+		parts := strings.Split(items, ",")
+		returnCode, ticket := parts[0], parts[1]
+		return ticket, checkError(returnCode)
+	case error:
+		return "", t
+	}
+	return "", nil
+}
 
 func (b bankSantander) RegisterBoleto(boleto *models.BoletoRequest) (models.BoletoResponse, error) {
 	r := flow.NewFlow()
@@ -60,6 +87,11 @@ func (b bankSantander) ProcessBoleto(boleto *models.BoletoRequest) (models.Bolet
 	errs := b.ValidateBoleto(boleto)
 	if len(errs) > 0 {
 		return models.BoletoResponse{Errors: errs}, nil
+	}
+	if ticket, err := b.GetTicket(boleto); err != nil {
+		return models.BoletoResponse{Errors: errs}, err
+	} else {
+		boleto.Authentication.AuthorizationToken = ticket
 	}
 	return b.RegisterBoleto(boleto)
 }

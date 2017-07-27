@@ -79,6 +79,10 @@ const registerSantanderResponse = `
 `
 
 const requestTicket = `
+
+## SOAPAction:registraTitulo
+## Content-Type:text/xml
+
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:impl="http://impl.webservice.dl.app.bsbr.altec.com/">
    <soapenv:Header/>
    <soapenv:Body>
@@ -188,8 +192,8 @@ const ticketReponse = `
     <soapenv:Body> 
         <dlwmin:createResponse xmlns:dlwmin="http://impl.webservice.dl.app.bsbr.altec.com/">
             <TicketResponse>
-                <retCode>0</retCode>
-                <ticket>cfslcN5/EJuS3WSZIMnUp6P2pllnSra78ABGSocUKwpZd2TmKoKknBIWVjALtRC9bfa8CoKU7DBKD8dMhYWyv7i+VSGqnjGq8Lg99U1EzdrItIALgPnFm6LpsIFThCRZ</ticket>
+                <retCode>{{returnCode}}</retCode>
+                <ticket>{{ticket}}</ticket>
             </TicketResponse>
         </dlwmin:createResponse>
     </soapenv:Body>

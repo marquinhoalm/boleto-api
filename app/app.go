@@ -71,11 +71,15 @@ func configFlags(devMode, mockMode, disableLog, httpOnly bool) {
 		os.Setenv("ELASTIC_URL", "http://localhost:9200")
 		os.Setenv("MONGODB_URL", "localhost:27017")
 		os.Setenv("BOLETO_JSON_STORE", "/home/philippe/boletodb/upMongo")
+		os.Setenv("URL_SANTANDER_TICKET", "https://ymbdlb.isbanbr.dev.corp/dl-ticket-services/TicketEndpointService")
+		os.Setenv("URL_SANTANDER_REGISTER", "https://ymbcashhml.santander.com.br:443/ymbsrv/CobrancaEndpointService")
 		if mockMode {
 			os.Setenv("URL_BB_REGISTER_BOLETO", "http://localhost:4000/registrarBoleto")
 			os.Setenv("URL_BB_TOKEN", "http://localhost:4000/oauth/token")
 			os.Setenv("URL_CAIXA", "http://localhost:4000/caixa/registrarBoleto")
 			os.Setenv("URL_CITI", "http://localhost:4000/citi/registrarBoleto")
+			os.Setenv("URL_SANTANDER_TICKET", "http://localhost:4000/santander/get-ticket")
+			os.Setenv("URL_SANTANDER_REGISTER", "http://localhost:4000/santander/register")
 		}
 	}
 	config.Install(mockMode, devMode, disableLog, httpOnly)
